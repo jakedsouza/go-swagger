@@ -112,6 +112,26 @@ func TestBuildRequest_SetBody(t *testing.T) {
 	assert.Equal(t, bd, r.payload)
 }
 
+func TestBuildRequest_BuildHTTP_NoPayload(t *testing.T) {
+	// bd := []struct{ Name, Hobby string }{{"Tom", "Organ trail"}, {"John", "Bird watching"}}
+	reqWrtr := client.RequestWriterFunc(func(req client.Request, reg strfmt.Registry) error {
+		req.SetQueryParam("hello", "world")
+		req.SetPathParam("id", "1234")
+		req.SetHeaderParam("X-Rate-Limit", "200")
+		return nil
+	})
+	r, _ := newRequest("DELETE", "/flats/{id}/", reqWrtr)
+	// r.SetHeaderParam(httpkit.HeaderContentType, httpkit.JSONMime) // commented out on purpose
+
+	req, err := r.BuildHTTP(httpkit.JSONMime, testProducers, nil)
+	if assert.NoError(t, err) && assert.NotNil(t, req) {
+		assert.Equal(t, "200", req.Header.Get("x-rate-limit"))
+		assert.Equal(t, "world", req.URL.Query().Get("hello"))
+		assert.Equal(t, "/flats/1234/", req.URL.Path)
+		assert.Equal(t, httpkit.JSONMime, req.Header.Get(httpkit.HeaderContentType))
+	}
+}
+
 func TestBuildRequest_BuildHTTP_Payload(t *testing.T) {
 	bd := []struct{ Name, Hobby string }{{"Tom", "Organ trail"}, {"John", "Bird watching"}}
 	reqWrtr := client.RequestWriterFunc(func(req client.Request, reg strfmt.Registry) error {
@@ -122,7 +142,7 @@ func TestBuildRequest_BuildHTTP_Payload(t *testing.T) {
 		return nil
 	})
 	r, _ := newRequest("GET", "/flats/{id}/", reqWrtr)
-	r.SetHeaderParam(httpkit.HeaderContentType, httpkit.JSONMime)
+	// r.SetHeaderParam(httpkit.HeaderContentType, httpkit.JSONMime)
 
 	req, err := r.BuildHTTP(httpkit.JSONMime, testProducers, nil)
 	if assert.NoError(t, err) && assert.NotNil(t, req) {
@@ -149,7 +169,7 @@ func TestBuildRequest_BuildHTTP_XMLPayload(t *testing.T) {
 		return nil
 	})
 	r, _ := newRequest("GET", "/flats/{id}/", reqWrtr)
-	r.SetHeaderParam(httpkit.HeaderContentType, httpkit.XMLMime)
+	// r.SetHeaderParam(httpkit.HeaderContentType, httpkit.XMLMime)
 
 	req, err := r.BuildHTTP(httpkit.XMLMime, testProducers, nil)
 	if assert.NoError(t, err) && assert.NotNil(t, req) {
@@ -172,7 +192,7 @@ func TestBuildRequest_BuildHTTP_TextPayload(t *testing.T) {
 		return nil
 	})
 	r, _ := newRequest("GET", "/flats/{id}/", reqWrtr)
-	r.SetHeaderParam(httpkit.HeaderContentType, httpkit.TextMime)
+	// r.SetHeaderParam(httpkit.HeaderContentType, httpkit.TextMime)
 
 	req, err := r.BuildHTTP(httpkit.TextMime, testProducers, nil)
 	if assert.NoError(t, err) && assert.NotNil(t, req) {
@@ -194,7 +214,7 @@ func TestBuildRequest_BuildHTTP_Form(t *testing.T) {
 		return nil
 	})
 	r, _ := newRequest("GET", "/flats/{id}/", reqWrtr)
-	r.SetHeaderParam(httpkit.HeaderContentType, httpkit.JSONMime)
+	// r.SetHeaderParam(httpkit.HeaderContentType, httpkit.JSONMime)
 
 	req, err := r.BuildHTTP(httpkit.JSONMime, testProducers, nil)
 	if assert.NoError(t, err) && assert.NotNil(t, req) {
@@ -218,7 +238,7 @@ func TestBuildRequest_BuildHTTP_Files(t *testing.T) {
 		return nil
 	})
 	r, _ := newRequest("GET", "/flats/{id}/", reqWrtr)
-	r.SetHeaderParam(httpkit.HeaderContentType, httpkit.JSONMime)
+	// r.SetHeaderParam(httpkit.HeaderContentType, httpkit.JSONMime)
 	req, err := r.BuildHTTP(httpkit.JSONMime, testProducers, nil)
 	if assert.NoError(t, err) && assert.NotNil(t, req) {
 		assert.Equal(t, "200", req.Header.Get("x-rate-limit"))
