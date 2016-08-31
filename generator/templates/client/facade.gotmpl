@@ -24,13 +24,15 @@ import (
 // Default {{ humanize .Name }} HTTP client.
 var Default = NewHTTPClient(nil)
 
+// DefaultTransport {{ humanize .Name }} DefaultTransport.
+var DefaultTransport = httptransport.New({{ printf "%#v" .Host }}, {{ printf "%#v" .BasePath }}, {{ printf "%#v" .Schemes }})
+
 // NewHTTPClient creates a new {{ humanize .Name }} HTTP client.
 func NewHTTPClient(formats strfmt.Registry) *{{ pascalize .Name }} {
   if formats == nil {
     formats = strfmt.Default
   }
-  transport := httptransport.New({{ printf "%#v" .Host }}, {{ printf "%#v" .BasePath }}, {{ printf "%#v" .Schemes }})
-  return New(transport, formats)
+  return New(DefaultTransport, formats)
 }
 
 // New creates a new {{ humanize .Name }} client
